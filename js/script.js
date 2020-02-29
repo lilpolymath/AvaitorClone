@@ -1,4 +1,4 @@
-var Colors = {
+let Colors = {
   red: 0xf25346,
   white: 0xd8d0d1,
   pink: 0x59322e,
@@ -7,7 +7,7 @@ var Colors = {
   blue: 0x68c3c0,
 };
 
-var camera,
+let camera,
   fieldOfView,
   aspectRatio,
   nearPlane,
@@ -104,7 +104,7 @@ function handleWindowResize() {
   camera.updateProjectionMatrix();
 }
 
-var hemisphereLight, shadowLight;
+let hemisphereLight, shadowLight;
 
 function createLights() {
   // A hemisphere light is a gradient coloured light
@@ -138,22 +138,18 @@ function createLights() {
   scene.add(hemisphereLight);
   scene.add(shadowLight);
 }
-function createSky() {}
-function createPlane() {}
-function createSea() {}
-function loop() {}
 
 // Creating the objects that we are going to need
 Sea = () => {
   //  Defining the dimensions of the cylinder.
   // Takes on the parameters radius top, radius bottom, height, number of segment,
-  var geom = new THREE.CylinderGeometry(600, 600, 800, 80, 10);
+  let geom = new THREE.CylinderGeometry(600, 600, 800, 80, 10);
 
   // rotate to the x-axis
   geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
 
   // Create the material
-  var mat = new THREE.MeshPhongMaterial({
+  let mat = new THREE.MeshPhongMaterial({
     color: Colors.blue,
     transparent: true,
     opacity: 0.6,
@@ -167,10 +163,10 @@ Sea = () => {
   this.mesh.receiveShadow = true;
 };
 
-var Sea;
+let Sea;
 
 function createSea() {
-  sea =  new Sea();
+  sea = new Sea();
 
   // Setting the position of the sea on the Scene
   sea.mesh.position.y = -600;
@@ -181,28 +177,29 @@ Could = function () {
   this.mesh = new THREE.Object3D();
 
   // create a cube geometry
-  var geom = new THREE.CylinderGeometry(20,20,20);
+  let geom = new THREE.CylinderGeometry(20, 20, 20);
 
-  var mat = new THREE.MeshPhongMaterial({
+  // white material for cloud color.
+  let mat = new THREE.MeshPhongMaterial({
     color: Colors.white;
   })
 
-  var nBlocks = 3 + Math.floor(Math.random() * 3);
-  for (var i = 0; i < nBlocks; i++) {
+  let nBlocks = 3 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < nBlocks; i++) {
 
     // create the mesh by cloning the geometry
-    var m = new THREE.Mesh(geom, mat);
+    let m = new THREE.Mesh(geom, mat);
 
     // Set the positon and rotation of the cube randomly
-    m.position.x = i*15;
-    m.position.y = Math.random()*10;
-    m.position.z = Math.random()*10;
+    m.position.x = i * 15;
+    m.position.y = Math.random() * 10;
+    m.position.z = Math.random() * 10;
 
-    m.rotation.y = Math.random()*Math.PI*2;
-    m.rotation.z = Math.random()*Math.PI*2;
+    m.rotation.y = Math.random() * Math.PI * 2;
+    m.rotation.z = Math.random() * Math.PI * 2;
 
     // set the size of the cube randomly
-    var s = 0.1 + Math.random() * 0.9;
+    let s = 0.1 + Math.random() * 0.9;
     m.scale(s, s, s);
     m.castShadow = true;
     m.receiveShadow = true;
@@ -212,6 +209,57 @@ Could = function () {
   }
 }
 
+Sky = function () {
+  // Created an empty container
+  this.mesh = new THREE.Object3D();
+
+  //  nUmber of clouds in total
+  this.nClouds = 20;
+
+  // For proper cloud distribution
+  let stepAngle = Math.PI * 2 / this.nClouds;
+
+  // Creating the clouds
+  for (let i = 0; i < this.nClouds; i++) {
+    let c = new Cloud();
+
+    // setting rotation and position of each cloud
+    let a = stepAngle * i;
+    let h = 750 + Math.random() * 200;
+
+    // Converting polar coordinates into Cartesian coordinates
+    c.mesh.position.x = Math.sin(a) * h;
+    c.mesh.position.y = Math.cos(a) * h;
+
+    // rotate the cloud according to its position
+    c.mesh.rotation.z = a + Math.PI / 2;
+
+    // Position clouds at random depths in the scene
+    c.mesh.position.z = -400 - Math.random() * 400;
+
+    // Random scale setting for size.
+    let s = 1 + Math.random() * 2;
+    c.mesh.scale.set(s, s, s);
+
+    // adding the mesh into the parent scene
+    this.mesh.add(c.mesh);
+  }
+}
+
+let sky;
+
+function createSky() {
+  sky = new Sky();
+  sky.mesh.position.y = -600;
+  scene.add(sky.mesh);
+}
+
+function createPlane() {
+
+}
+function createSea() { }
+function loop() { }
+
 function myNotes() {
   // NOTES
   // A scene is where every object needs to be added before they can be rendered
@@ -219,7 +267,7 @@ function myNotes() {
   // A renderer displays the scene using WebGL
   // Objects are the things that you want to render.
   // A renderer consists of a scene and camera(s) at the basic setup up.
-  // A scene consists of various objects which are referred to as Mesh
+  // A scene consists of letious objects which are referred to as Mesh
   // A mesh consist of a geometry and a material.
   // The geometry is majorly about the shape/dimension of the object.
   // The material deals majorly with the texture and describes the surface properties.
