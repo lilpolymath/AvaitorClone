@@ -3,7 +3,7 @@ let Colors = {
   white: 0xd8d0d1,
   pink: 0x59322e,
   brown: 0xf5986e,
-  darkBrown: 0x23910f,
+  darkBrown: 0x23190f,
   blue: 0x68c3c0,
 };
 
@@ -18,6 +18,7 @@ let camera,
   container;
 
 console.log(Colors);
+let mousePos = { x: 0, y: 0 };
 
 function createScene() {
   // Getting the height and the width of the screen
@@ -28,9 +29,6 @@ function createScene() {
 
   //  New scene
   scene = new THREE.Scene();
-
-  // Adding fog to the screen with the same color as the background color acts like opacity.
-  scene.fog = new THREE.Fog(0xf7d9aa, 100, 950);
 
   // Creating the camera
   aspectRatio = WIDTH / HEIGHT; // mostly for proportional rendering more like the screen resolution
@@ -45,10 +43,13 @@ function createScene() {
     farPlane
   );
 
+  // Adding fog to the screen with the same color as the background color acts like opacity.
+  scene.fog = new THREE.Fog(0xf7d9aa, 100, 950);
+
   // Camera position is in 3D plane
   camera.position.x = 0;
-  camera.position.y = 200;
-  camera.position.z = 100;
+  camera.position.y = 100;
+  camera.position.z = 200;
 
   // Creating the renderer
   renderer = new THREE.WebGLRenderer({
@@ -90,11 +91,11 @@ let hemisphereLight, shadowLight;
 function createLights() {
   // A hemisphere light is a gradient coloured light
   // the parameters are sky color, ground color and the intensity of the light
-  hemisphereLight = THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9);
+  hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9);
 
   // Directional light shines from a specific direction
   // It is like a touch light and helps to cast a shadow
-  shadowLight = THREE.DirectionalLight(0xfffff, 0.9);
+  shadowLight = new THREE.DirectionalLight(0xffffff, 0.9);
 
   // Setting the position of the shadow light
   shadowLight.position.set(150, 350, 350);
@@ -121,10 +122,10 @@ function createLights() {
 }
 
 // Creating the objects that we are going to need
-Sea = () => {
+Sea = function() {
   //  Defining the dimensions of the cylinder.
   // Takes on the parameters radius top, radius bottom, height, number of segment,
-  let geom = new THREE.CylinderGeometry(600, 600, 800, 80, 10);
+  let geom = new THREE.CylinderGeometry(600, 600, 800, 40, 10);
 
   // rotate to the x-axis
   geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
@@ -154,11 +155,12 @@ function createSea() {
   scene.add(sea.mesh);
 }
 
-Could = function() {
+Cloud = function() {
   this.mesh = new THREE.Object3D();
+  this.mesh.name = 'cloud';
 
   // create a cube geometry
-  let geom = new THREE.CylinderGeometry(20, 20, 20);
+  let geom = new THREE.CubeGeometry(20, 20, 20);
 
   // white material for cloud color.
   let mat = new THREE.MeshPhongMaterial({
@@ -168,19 +170,18 @@ Could = function() {
   let nBlocks = 3 + Math.floor(Math.random() * 3);
   for (let i = 0; i < nBlocks; i++) {
     // create the mesh by cloning the geometry
-    let m = new THREE.Mesh(geom, mat);
+    let m = new THREE.Mesh(geom.clone(), mat);
 
     // Set the positon and rotation of the cube randomly
     m.position.x = i * 15;
     m.position.y = Math.random() * 10;
     m.position.z = Math.random() * 10;
-
     m.rotation.y = Math.random() * Math.PI * 2;
     m.rotation.z = Math.random() * Math.PI * 2;
 
     // set the size of the cube randomly
     let s = 0.1 + Math.random() * 0.9;
-    m.scale(s, s, s);
+    m.scale.set(s, s, s);
     m.castShadow = true;
     m.receiveShadow = true;
 
@@ -196,12 +197,15 @@ Sky = function() {
   //  nUmber of clouds in total
   this.nClouds = 20;
 
+  this.clouds = [];
+
   // For proper cloud distribution
   let stepAngle = (Math.PI * 2) / this.nClouds;
 
   // Creating the clouds
   for (let i = 0; i < this.nClouds; i++) {
     let c = new Cloud();
+    this.clouds.push(c);
 
     // setting rotation and position of each cloud
     let a = stepAngle * i;
@@ -234,7 +238,7 @@ function createSky() {
   scene.add(sky.mesh);
 }
 
-let AirPlane = function() {
+AirPlane = function() {
   this.mesh = new THREE.Object3D();
 
   // Creating the cabin
@@ -255,6 +259,7 @@ let AirPlane = function() {
     shading: THREE.FlatShading,
   });
   let engine = new THREE.Mesh(geomEngine, matEngine);
+  engine.position.x = 40;
   engine.castShadow = true;
   engine.receiveShadow = true;
   this.mesh.add(engine);
@@ -283,7 +288,7 @@ let AirPlane = function() {
   this.mesh.add(wing);
 
   // Creating the propeller
-  let geomPropeller = new THREE.BoxGeometry();
+  let geomPropeller = new THREE.BoxGeometry(20, 10, 10, 1, 1, 1);
   let matPropeller = new THREE.MeshPhongMaterial({
     color: Colors.brown,
     shading: THREE.FlatShading,
@@ -292,20 +297,20 @@ let AirPlane = function() {
   this.propeller.castShadow = true;
   this.propeller.receiveShadow = true;
 
-  let geomBlade = new THREE.BoxGeometry();
+  // Blade
+  let geomBlade = new THREE.BoxGeometry(1, 100, 10, 1, 1, 1);
   let matBlade = new THREE.MeshPhongMaterial({
     color: Colors.darkBrown,
     shading: THREE.FlatShading,
   });
 
-  // Blades
   let blade = new THREE.Mesh(geomBlade, matBlade);
   blade.position.set(8, 0, 0);
   blade.castShadow = true;
   blade.receiveShadow = true;
   this.propeller.add(blade);
   this.propeller.position.set(50, 0, 0);
-  this.mesh.add(propeller);
+  this.mesh.add(this.propeller);
 };
 
 let airPlane;
@@ -318,7 +323,7 @@ createPlane = () => {
 };
 
 normalize = (v, vmin, vmax, tmin, tmax) => {
-  let nx = Math.max(Math.min(v, vmax), vmin);
+  let nv = Math.max(Math.min(v, vmax), vmin);
   let dv = vmax - vmin;
   let pc = (nv - vmin) / dv;
   let dt = tmax - tmin;
@@ -328,21 +333,20 @@ normalize = (v, vmin, vmax, tmin, tmax) => {
 };
 
 updatePlane = () => {
-  let targetX = normalize(mousePos.x, -1, 1, -100, 100);
-  let targetY = normalize(mousePos.y, -1, 1, 25, 175);
+  let targetY = normalize(mousePos.y, -0.75, 0.75, 25, 175);
+  let targetX = normalize(mousePos.x, -0.75, 0.75, -100, 100);
 
   airPlane.mesh.position.x = targetX;
   airPlane.mesh.position.y = targetY;
 
-  airPlane.propeller.rotation += 0.03;
+  airPlane.propeller.rotation.x += 0.3;
 };
 
 loop = () => {
-  airPlane.propeller.rotation.x += 0.3;
+  updatePlane();
+
   sea.mesh.rotation.z += 0.005;
   sky.mesh.rotation.z += 0.01;
-
-  updatePlane();
 
   // calling the renderer
   renderer.render(scene, camera);
@@ -364,8 +368,6 @@ function myNotes() {
   // The material deals majorly with the texture and describes the surface properties.
   // Both the geometry and the texture can be imported from external resources.
 }
-
-let mousePos = { x: 0, y: 0 };
 
 handleMouseMove = event => {
   let tx = -1 + (event.clientX / WIDTH) * 2;
