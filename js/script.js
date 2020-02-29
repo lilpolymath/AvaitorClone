@@ -254,11 +254,99 @@ function createSky() {
   scene.add(sky.mesh);
 }
 
-function createPlane() {
+let AirPlane = function () {
+  this.mesh = new THREE.Object3D();
 
+  // Creating the cabin
+  let geomCockpit = new THREE.BoxGeometry(60, 50, 50, 1, 1, 1);
+  let matCockpit = new THREE.MeshPhongMaterial({
+    color: Colors.red,
+    shading: THREE.FlatShading,
+  });
+  let cockpit = new THREE.Mesh(geomCockpit, matCockpit);
+  cockpit.castShadow = true;
+  cockpit.receiveShadow = true;
+  this.mesh.add(cockpit);
+
+  // Creating the engine
+  let geomEngine = new THREE.BoxGeometry(20, 50, 50, 1, 1, 1);
+  let matEngine = new THREE.MeshPhongMaterial({
+    color: Colors.white,
+    shading: THREE.FlatShading,
+  });
+  let engine = new THREE.Mesh(geomEngine, matEngine);
+  engine.castShadow = true;
+  engine.receiveShadow = true;
+  this.mesh.add(engine);
+
+  // create the tail
+  let geomTail = new THREE.BoxGeometry(15, 20, 5, 1, 1, 1);
+  let matTail = new THREE.MeshPhongMaterial({
+    color: Colors.red,
+    shading: THREE.FlatShading
+  });
+  let tail = new THREE.Mesh(geomTail, matTail);
+  tail.position.set(-35,25,0);
+  tail.castShadow = true;
+  tail.receiveShadow = true;
+  this.mesh.add(tail);
+
+  // Creating the wing
+  let geomWing = new THREE.BoxGeometry(40,8,150,1,1,1);
+  let matWing =  new THREE.MeshPhongMaterial({
+    color: Colors.white,
+    shading: THREE.FlatShading,
+  });
+  let wing = new THREE.Mesh(geomWing, matWing);
+  wing.castShadow = true;
+  wing.receiveShadow = true;
+  this.mesh.add(wing);
+
+  // Creating the propeller
+  let geomPropeller = new THREE.BoxGeometry();
+  let matPropeller =  new THREE.MeshPhongMaterial({
+    color: Colors.brown,
+    shading: THREE.FlatShading
+  });
+  this.propeller = new THREE.Mesh(geomPropeller, matPropeller);
+  this.propeller.castShadow = true;
+  this.propeller.receiveShadow = true;
+
+  let geomBlade = new THREE.BoxGeometry();
+  let matBlade = new THREE.MeshPhongMaterial({
+    color: Colors.darkBrown,
+    shading: THREE.FlatShading,
+  });
+
+  // Blades
+  let blade = new THREE.Mesh(geomBlade, matBlade);
+  blade.position.set(8,0,0);
+  blade.castShadow =  true;
+  blade.receiveShadow = true;
+  this.propeller.add(blade);
+  this.propeller.position.set(50,0,0);
+  this.mesh.add(propeller);
 }
+
+let airPlane;
+
+function createPlane() {
+  airPlane =  new AirPlane();
+  airPlane.mesh.scale.set(0.25,0.25,0.25);
+  airPlane.mesh.position.y = 100;
+  scene.add(airPlane.mesh);
+}
+
 function createSea() { }
-function loop() { }
+function loop() {
+  airPlane.propeller.rotation.x += 0.3;
+  sea.mesh.rotation.z += 0.005;
+  sky.mesh.rotation.z += 0.01;
+
+  // calling the renderer
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
 
 function myNotes() {
   // NOTES
