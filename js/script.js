@@ -19,25 +19,6 @@ let camera,
 
 console.log(Colors);
 
-window.addEventListener('load', init, false);
-
-function init() {
-  // Setup the scene and the camera
-  createScene();
-
-  // add the Lights
-  createLights();
-
-  // add the aesthetics/objects
-  createSky();
-  createPlane();
-  createSea();
-
-  // start a loop that will update the object's position
-  // and render the scene on each frame
-  loop();
-}
-
 function createScene() {
   // Getting the height and the width of the screen
   // So we can use accurate figures for aspect ratio and size of the renderer.
@@ -49,7 +30,7 @@ function createScene() {
   scene = new THREE.Scene();
 
   // Adding fog to the screen with the same color as the background color acts like opacity.
-  scene.fog = new THREE.fog(0xf7d9aa, 100, 950);
+  scene.fog = new THREE.Fog(0xf7d9aa, 100, 950);
 
   // Creating the camera
   aspectRatio = WIDTH / HEIGHT; // mostly for proportional rendering more like the screen resolution
@@ -163,7 +144,7 @@ Sea = () => {
   this.mesh.receiveShadow = true;
 };
 
-let Sea;
+let sea;
 
 function createSea() {
   sea = new Sea();
@@ -173,7 +154,7 @@ function createSea() {
   scene.add(sea.mesh);
 }
 
-Could = function () {
+Could = function() {
   this.mesh = new THREE.Object3D();
 
   // create a cube geometry
@@ -181,12 +162,11 @@ Could = function () {
 
   // white material for cloud color.
   let mat = new THREE.MeshPhongMaterial({
-    color: Colors.white;
-  })
+    color: Colors.white,
+  });
 
   let nBlocks = 3 + Math.floor(Math.random() * 3);
   for (let i = 0; i < nBlocks; i++) {
-
     // create the mesh by cloning the geometry
     let m = new THREE.Mesh(geom, mat);
 
@@ -207,9 +187,9 @@ Could = function () {
     // add the cube to the container
     this.mesh.add(m);
   }
-}
+};
 
-Sky = function () {
+Sky = function() {
   // Created an empty container
   this.mesh = new THREE.Object3D();
 
@@ -217,7 +197,7 @@ Sky = function () {
   this.nClouds = 20;
 
   // For proper cloud distribution
-  let stepAngle = Math.PI * 2 / this.nClouds;
+  let stepAngle = (Math.PI * 2) / this.nClouds;
 
   // Creating the clouds
   for (let i = 0; i < this.nClouds; i++) {
@@ -244,7 +224,7 @@ Sky = function () {
     // adding the mesh into the parent scene
     this.mesh.add(c.mesh);
   }
-}
+};
 
 let sky;
 
@@ -254,7 +234,7 @@ function createSky() {
   scene.add(sky.mesh);
 }
 
-let AirPlane = function () {
+let AirPlane = function() {
   this.mesh = new THREE.Object3D();
 
   // Creating the cabin
@@ -283,17 +263,17 @@ let AirPlane = function () {
   let geomTail = new THREE.BoxGeometry(15, 20, 5, 1, 1, 1);
   let matTail = new THREE.MeshPhongMaterial({
     color: Colors.red,
-    shading: THREE.FlatShading
+    shading: THREE.FlatShading,
   });
   let tail = new THREE.Mesh(geomTail, matTail);
-  tail.position.set(-35,25,0);
+  tail.position.set(-35, 25, 0);
   tail.castShadow = true;
   tail.receiveShadow = true;
   this.mesh.add(tail);
 
   // Creating the wing
-  let geomWing = new THREE.BoxGeometry(40,8,150,1,1,1);
-  let matWing =  new THREE.MeshPhongMaterial({
+  let geomWing = new THREE.BoxGeometry(40, 8, 150, 1, 1, 1);
+  let matWing = new THREE.MeshPhongMaterial({
     color: Colors.white,
     shading: THREE.FlatShading,
   });
@@ -304,9 +284,9 @@ let AirPlane = function () {
 
   // Creating the propeller
   let geomPropeller = new THREE.BoxGeometry();
-  let matPropeller =  new THREE.MeshPhongMaterial({
+  let matPropeller = new THREE.MeshPhongMaterial({
     color: Colors.brown,
-    shading: THREE.FlatShading
+    shading: THREE.FlatShading,
   });
   this.propeller = new THREE.Mesh(geomPropeller, matPropeller);
   this.propeller.castShadow = true;
@@ -320,33 +300,56 @@ let AirPlane = function () {
 
   // Blades
   let blade = new THREE.Mesh(geomBlade, matBlade);
-  blade.position.set(8,0,0);
-  blade.castShadow =  true;
+  blade.position.set(8, 0, 0);
+  blade.castShadow = true;
   blade.receiveShadow = true;
   this.propeller.add(blade);
-  this.propeller.position.set(50,0,0);
+  this.propeller.position.set(50, 0, 0);
   this.mesh.add(propeller);
-}
+};
 
 let airPlane;
 
-function createPlane() {
-  airPlane =  new AirPlane();
-  airPlane.mesh.scale.set(0.25,0.25,0.25);
+createPlane = () => {
+  airPlane = new AirPlane();
+  airPlane.mesh.scale.set(0.25, 0.25, 0.25);
   airPlane.mesh.position.y = 100;
   scene.add(airPlane.mesh);
-}
+};
 
-function createSea() { }
-function loop() {
+normalize = (v, vmin, vmax, tmin, tmax) => {
+  let nx = Math.max(Math.min(v, vmax), vmin);
+  let dv = vmax - vmin;
+  let pc = (nv - vmin) / dv;
+  let dt = tmax - tmin;
+  let tv = tmin + pc * dt;
+
+  return tv;
+};
+
+updatePlane = () => {
+  let targetX = normalize(mousePos.x, -1, 1, -100, 100);
+  let targetY = normalize(mousePos.y, -1, 1, 25, 175);
+
+  airPlane.mesh.position.x = targetX;
+  airPlane.mesh.position.y = targetY;
+
+  airPlane.propeller.rotation += 0.03;
+};
+
+loop = () => {
   airPlane.propeller.rotation.x += 0.3;
   sea.mesh.rotation.z += 0.005;
   sky.mesh.rotation.z += 0.01;
 
+  updatePlane();
+
   // calling the renderer
   renderer.render(scene, camera);
+
+  // the looping
   requestAnimationFrame(loop);
-}
+};
 
 function myNotes() {
   // NOTES
@@ -360,4 +363,35 @@ function myNotes() {
   // The geometry is majorly about the shape/dimension of the object.
   // The material deals majorly with the texture and describes the surface properties.
   // Both the geometry and the texture can be imported from external resources.
+}
+
+let mousePos = { x: 0, y: 0 };
+
+handleMouseMove = event => {
+  let tx = -1 + (event.clientX / WIDTH) * 2;
+  let ty = 1 - (event.clientY / HEIGHT) * 2;
+
+  mousePos = { x: tx, y: ty };
 };
+
+function init() {
+  // Setup the scene and the camera
+  createScene();
+
+  // add the Lights
+  createLights();
+
+  // add the aesthetics/objects
+  createSky();
+  createPlane();
+  createSea();
+
+  // listener for mouse movement
+  document.addEventListener('mousemove', handleMouseMove, false);
+
+  // start a loop that will update the object's position
+  // and render the scene on each frame
+  loop();
+}
+
+window.addEventListener('load', init, false);
