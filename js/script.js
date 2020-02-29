@@ -177,6 +177,41 @@ function createSea() {
   scene.add(sea.mesh);
 }
 
+Could = function () {
+  this.mesh = new THREE.Object3D();
+
+  // create a cube geometry
+  var geom = new THREE.CylinderGeometry(20,20,20);
+
+  var mat = new THREE.MeshPhongMaterial({
+    color: Colors.white;
+  })
+
+  var nBlocks = 3 + Math.floor(Math.random() * 3);
+  for (var i = 0; i < nBlocks; i++) {
+
+    // create the mesh by cloning the geometry
+    var m = new THREE.Mesh(geom, mat);
+
+    // Set the positon and rotation of the cube randomly
+    m.position.x = i*15;
+    m.position.y = Math.random()*10;
+    m.position.z = Math.random()*10;
+
+    m.rotation.y = Math.random()*Math.PI*2;
+    m.rotation.z = Math.random()*Math.PI*2;
+
+    // set the size of the cube randomly
+    var s = 0.1 + Math.random() * 0.9;
+    m.scale(s, s, s);
+    m.castShadow = true;
+    m.receiveShadow = true;
+
+    // add the cube to the container
+    this.mesh.add(m);
+  }
+}
+
 function myNotes() {
   // NOTES
   // A scene is where every object needs to be added before they can be rendered
