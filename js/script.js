@@ -144,7 +144,38 @@ function createSea() {}
 function loop() {}
 
 // Creating the objects that we are going to need
-Sea = () => {};
+Sea = () => {
+  //  Defining the dimensions of the cylinder.
+  // Takes on the parameters radius top, radius bottom, height, number of segment,
+  var geom = new THREE.CylinderGeometry(600, 600, 800, 80, 10);
+
+  // rotate to the x-axis
+  geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+
+  // Create the material
+  var mat = new THREE.MeshPhongMaterial({
+    color: Colors.blue,
+    transparent: true,
+    opacity: 0.6,
+    shading: THREE.FlatShading,
+  });
+
+  // Creating an object
+  this.mesh = new THREE.Mesh(geom, mat);
+
+  // ALlowing the sea to recieve shadows cast on it.
+  this.mesh.receiveShadow = true;
+};
+
+var Sea;
+
+function createSea() {
+  sea =  new Sea();
+
+  // Setting the position of the sea on the Scene
+  sea.mesh.position.y = -600;
+  scene.add(sea.mesh);
+}
 
 function myNotes() {
   // NOTES
@@ -153,8 +184,9 @@ function myNotes() {
   // A renderer displays the scene using WebGL
   // Objects are the things that you want to render.
   // A renderer consists of a scene and camera(s) at the basic setup up.
-  // A scene consists of various objects with are referred to as Mesh
+  // A scene consists of various objects which are referred to as Mesh
   // A mesh consist of a geometry and a material.
   // The geometry is majorly about the shape/dimension of the object.
-  // The materialdeals majorly with the texture and describes the surface properties.
-}
+  // The material deals majorly with the texture and describes the surface properties.
+  // Both the geometry and the texture can be imported from external resources.
+};
