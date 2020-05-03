@@ -17,7 +17,6 @@ let camera,
   renderer,
   container;
 
-console.log(Colors);
 let mousePos = { x: 0, y: 0 };
 
 function createScene() {
@@ -125,7 +124,7 @@ function createLights() {
 Sea = function() {
   //  Defining the dimensions of the cylinder.
   // Takes on the parameters radius top, radius bottom, height, number of segment,
-  let geom = new THREE.CylinderGeometry(600, 600, 800, 40, 10);
+  const geom = new THREE.CylinderGeometry(600, 600, 800, 40, 10);
 
   // rotate to the x-axis
   geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
@@ -160,10 +159,10 @@ Cloud = function() {
   this.mesh.name = 'cloud';
 
   // create a cube geometry
-  let geom = new THREE.CubeGeometry(20, 20, 20);
+  const geom = new THREE.CubeGeometry(20, 20, 20);
 
   // white material for cloud color.
-  let mat = new THREE.MeshPhongMaterial({
+  const mat = new THREE.MeshPhongMaterial({
     color: Colors.white,
   });
 
@@ -200,7 +199,7 @@ Sky = function() {
   this.clouds = [];
 
   // For proper cloud distribution
-  let stepAngle = (Math.PI * 2) / this.nClouds;
+  const stepAngle = (Math.PI * 2) / this.nClouds;
 
   // Creating the clouds
   for (let i = 0; i < this.nClouds; i++) {
@@ -242,54 +241,54 @@ AirPlane = function() {
   this.mesh = new THREE.Object3D();
 
   // Creating the cabin
-  let geomCockpit = new THREE.BoxGeometry(60, 50, 50, 1, 1, 1);
-  let matCockpit = new THREE.MeshPhongMaterial({
+  const geomCockpit = new THREE.BoxGeometry(60, 50, 50, 1, 1, 1);
+  const matCockpit = new THREE.MeshPhongMaterial({
     color: Colors.red,
     shading: THREE.FlatShading,
   });
-  let cockpit = new THREE.Mesh(geomCockpit, matCockpit);
+  const cockpit = new THREE.Mesh(geomCockpit, matCockpit);
   cockpit.castShadow = true;
   cockpit.receiveShadow = true;
   this.mesh.add(cockpit);
 
   // Creating the engine
-  let geomEngine = new THREE.BoxGeometry(20, 50, 50, 1, 1, 1);
-  let matEngine = new THREE.MeshPhongMaterial({
+  const geomEngine = new THREE.BoxGeometry(20, 50, 50, 1, 1, 1);
+  const matEngine = new THREE.MeshPhongMaterial({
     color: Colors.white,
     shading: THREE.FlatShading,
   });
-  let engine = new THREE.Mesh(geomEngine, matEngine);
+  const engine = new THREE.Mesh(geomEngine, matEngine);
   engine.position.x = 40;
   engine.castShadow = true;
   engine.receiveShadow = true;
   this.mesh.add(engine);
 
   // create the tail
-  let geomTail = new THREE.BoxGeometry(15, 20, 5, 1, 1, 1);
-  let matTail = new THREE.MeshPhongMaterial({
+  const geomTail = new THREE.BoxGeometry(15, 20, 5, 1, 1, 1);
+  const matTail = new THREE.MeshPhongMaterial({
     color: Colors.red,
     shading: THREE.FlatShading,
   });
-  let tail = new THREE.Mesh(geomTail, matTail);
+  const tail = new THREE.Mesh(geomTail, matTail);
   tail.position.set(-35, 25, 0);
   tail.castShadow = true;
   tail.receiveShadow = true;
   this.mesh.add(tail);
 
   // Creating the wing
-  let geomWing = new THREE.BoxGeometry(40, 8, 150, 1, 1, 1);
-  let matWing = new THREE.MeshPhongMaterial({
+  const geomWing = new THREE.BoxGeometry(40, 8, 150, 1, 1, 1);
+  const matWing = new THREE.MeshPhongMaterial({
     color: Colors.white,
     shading: THREE.FlatShading,
   });
-  let wing = new THREE.Mesh(geomWing, matWing);
+  const wing = new THREE.Mesh(geomWing, matWing);
   wing.castShadow = true;
   wing.receiveShadow = true;
   this.mesh.add(wing);
 
   // Creating the propeller
-  let geomPropeller = new THREE.BoxGeometry(20, 10, 10, 1, 1, 1);
-  let matPropeller = new THREE.MeshPhongMaterial({
+  const geomPropeller = new THREE.BoxGeometry(20, 10, 10, 1, 1, 1);
+  const matPropeller = new THREE.MeshPhongMaterial({
     color: Colors.brown,
     shading: THREE.FlatShading,
   });
@@ -298,13 +297,13 @@ AirPlane = function() {
   this.propeller.receiveShadow = true;
 
   // Blade
-  let geomBlade = new THREE.BoxGeometry(1, 100, 10, 1, 1, 1);
-  let matBlade = new THREE.MeshPhongMaterial({
+  const geomBlade = new THREE.BoxGeometry(1, 100, 10, 1, 1, 1);
+  const matBlade = new THREE.MeshPhongMaterial({
     color: Colors.darkBrown,
     shading: THREE.FlatShading,
   });
 
-  let blade = new THREE.Mesh(geomBlade, matBlade);
+  const blade = new THREE.Mesh(geomBlade, matBlade);
   blade.position.set(8, 0, 0);
   blade.castShadow = true;
   blade.receiveShadow = true;
